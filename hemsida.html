@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalla Kriget - Uppdragscentral</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --folder-color: #c2b280;
+            --text-color: #e0e0e0;
+            --accent-color: #d32f2f;
+            --terminal-green: #33ff33;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: var(--bg-color);
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: hidden;
+        }
+
+        /* Behållare för menyn */
+        .menu-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            transition: opacity 0.5s ease;
+        }
+
+        .terminal-box {
+            max-width: 800px;
+            width: 100%;
+            background: #2a2a2a;
+            border: 2px solid #444;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .top-secret-stamp {
+            position: absolute;
+            top: 20px;
+            right: -30px;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 10px 50px;
+            transform: rotate(30deg);
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .mission-card {
+            background: #333;
+            border: 1px solid #555;
+            padding: 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .mission-card:hover:not(.locked) {
+            border-color: var(--terminal-green);
+            transform: translateY(-3px);
+            background: #3a3a3a;
+        }
+
+        .mission-card.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Iframe-behållaren som täcker allt */
+        #game-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            display: none; /* Dold som standard */
+            z-index: 100;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .back-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--accent-color);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 101;
+            font-weight: bold;
+            display: none;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <!-- STARTMENY -->
+    <div id="main-menu" class="menu-wrapper">
+        <div class="terminal-box">
+            <div class="top-secret-stamp">Topphemligt</div>
+            <h1 class="text-3xl font-bold text-center mb-6 uppercase border-b-2 border-[#c2b280] pb-4 text-[#c2b280]">Uppdragscentral</h1>
+            
+            <p class="mb-8 p-4 bg-black/20 border-l-4 border-[#33ff33] leading-relaxed text-[#e0e0e0]">
+                Välkommen, agent. Här hittar du dina aktiva uppdrag. Välj en mapp för att påbörja din genomgång.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Knapp till Operativa Arkiv -->
+                <div onclick="startGame('https://DIN_LÄNK_HÄR/QuizSida.html')" class="mission-card">
+                    <div>
+                        <h2 class="text-xl font-bold text-[#33ff33] mb-2">Operativa Arkiv</h2>
+                        <p class="text-sm text-gray-400">Genomgång av källmaterial och ett omfattande quiz om kalla krigets händelser.</p>
+                    </div>
+                    <span class="mt-4 text-[10px] uppercase py-1 px-2 bg-green-900/30 text-[#33ff33] self-start rounded">Status: Aktiv</span>
+                </div>
+
+                <!-- Låst Uppdrag -->
+                <div class="mission-card locked">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-500 mb-2">Spionjakten</h2>
+                        <p class="text-sm text-gray-500">Analysera spionagets värld. CIA mot KGB.</p>
+                    </div>
+                    <span class="mt-4 text-[10px] uppercase py-1 px-2 bg-gray-800 text-gray-600 self-start rounded">Låst</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SPEL-VY (Här laddas externa HTML-filer in) -->
+    <div id="game-container">
+        <iframe id="game-iframe" src=""></iframe>
+        <button id="close-btn" class="back-button" onclick="closeGame()">AVSLUTA UPPDRAG</button>
+    </div>
+
+    <script>
+        function startGame(url) {
+            // Här sätter vi in länken till din QuizSida.html
+            // Om du har laddat upp filen till en webbserver, byt ut URL nedan:
+            const gameUrl = url; 
+
+            const menu = document.getElementById('main-menu');
+            const container = document.getElementById('game-container');
+            const iframe = document.getElementById('game-iframe');
+            const closeBtn = document.getElementById('close-btn');
+
+            iframe.src = gameUrl;
+            menu.classList.add('hidden');
+            container.style.display = 'block';
+            closeBtn.style.display = 'block';
+        }
+
+        function closeGame() {
+            const menu = document.getElementById('main-menu');
+            const container = document.getElementById('game-container');
+            const iframe = document.getElementById('game-iframe');
+            const closeBtn = document.getElementById('close-btn');
+
+            iframe.src = ""; // Rensa iframen
+            container.style.display = 'none';
+            closeBtn.style.display = 'none';
+            menu.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
